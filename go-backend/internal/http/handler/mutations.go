@@ -778,14 +778,7 @@ func (h *Handler) tunnelUpdate(w http.ResponseWriter, r *http.Request) {
 	ipPreference := asString(req["ipPreference"])
 	localDomain := h.federationLocalDomain()
 
-	tx := h.repo.BeginTx()
-	if tx.Error != nil {
-		response.WriteJSON(w, response.Err(-2, tx.Error.Error()))
-		return
-	}
-	defer func() { tx.Rollback() }()
-
-	runtimeState, err := h.prepareTunnelCreateState(tx, req, typeVal, id)
+	runtimeState, err := h.prepareTunnelCreateState(h.repo.DB(), req, typeVal, id)
 	if err != nil {
 		response.WriteJSON(w, response.ErrDefault(err.Error()))
 		return
@@ -803,6 +796,14 @@ func (h *Handler) tunnelUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	applyTunnelPortsToRequest(req, runtimeState)
+
+	tx := h.repo.BeginTx()
+	if tx.Error != nil {
+		h.releaseFederationRuntimeRefs(federationReleaseRefs)
+		response.WriteJSON(w, response.Err(-2, tx.Error.Error()))
+		return
+	}
+	defer func() { tx.Rollback() }()
 
 	if err := h.repo.UpdateTunnelTx(
 		tx,
