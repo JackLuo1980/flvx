@@ -81,7 +81,7 @@ export const Navbar = () => {
             <button
               className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               title="面板设置"
-              onClick={() => navigate("/settings")}
+              onClick={() => navigate("/config")}
             >
               <svg
                 className="w-5 h-5"

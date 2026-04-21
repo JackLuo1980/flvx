@@ -15,7 +15,6 @@ import ProfilePage from "@/pages/profile";
 import LimitPage from "@/pages/limit";
 import ConfigPage from "@/pages/config";
 import PanelSharingPage from "@/pages/panel-sharing";
-import { SettingsPage } from "@/pages/settings";
 import AdminLayout from "@/layouts/admin";
 import H5Layout from "@/layouts/h5";
 import H5SimpleLayout from "@/layouts/h5-simple";
@@ -243,7 +242,6 @@ function App() {
           }
           path="/panel-sharing"
         />
-        <Route element={<SettingsPage />} path="/settings" />
       </Routes>
     </AnimatePresence>
   );
