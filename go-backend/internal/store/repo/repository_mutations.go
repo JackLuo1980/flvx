@@ -394,7 +394,7 @@ func (r *Repository) UpdateTunnelOrder(tunnelID int64, inx int, now int64) {
 		Updates(map[string]interface{}{"inx": inx, "updated_time": now}).Error
 }
 
-func (r *Repository) UpdateTunnelTx(tx *gorm.DB, tunnelID int64, name string, typeVal int, flow int64, trafficRatio float64, status int, inIP, ipPreference string, now int64) error {
+func (r *Repository) UpdateTunnelTx(tx *gorm.DB, tunnelID int64, name string, typeVal int, flow int64, trafficRatio float64, status int, inIP, ipPreference string, protocol string, now int64) error {
 	if tx == nil {
 		return errors.New("database unavailable")
 	}
@@ -408,6 +408,7 @@ func (r *Repository) UpdateTunnelTx(tx *gorm.DB, tunnelID int64, name string, ty
 			"status":        status,
 			"in_ip":         nullStringFromInterface(inIP),
 			"ip_preference": ipPreference,
+			"protocol":      protocol,
 			"updated_time":  now,
 		}).Error
 }

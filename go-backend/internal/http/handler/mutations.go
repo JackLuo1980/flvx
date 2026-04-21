@@ -657,11 +657,15 @@ func (h *Handler) tunnelCreate(w http.ResponseWriter, r *http.Request) {
 	if trimmed := strings.TrimSpace(inIP); trimmed != "" {
 		tunnelInIP = sql.NullString{String: trimmed, Valid: true}
 	}
+	tunnelProtocol := "tls"
+	if len(runtimeState.InNodes) > 0 && strings.TrimSpace(runtimeState.InNodes[0].Protocol) != "" {
+		tunnelProtocol = strings.TrimSpace(runtimeState.InNodes[0].Protocol)
+	}
 	tunnel := model.Tunnel{
 		Name:         name,
 		TrafficRatio: trafficRatio,
 		Type:         typeVal,
-		Protocol:     "tls",
+		Protocol:     tunnelProtocol,
 		Flow:         flow,
 		CreatedTime:  now,
 		UpdatedTime:  now,
@@ -702,7 +706,7 @@ func (h *Handler) tunnelCreate(w http.ResponseWriter, r *http.Request) {
 	if typeVal == 2 {
 		createdChains, createdServices, applyErr := h.applyTunnelRuntime(runtimeState)
 		if applyErr != nil {
-			h.rollbackTunnelRuntime(createdChains, createdServices, tunnelID)
+			h.rollbackTunnelRuntime(createdChains, createdServices, tunnelID, tunnelProtocol)
 			h.releaseFederationRuntimeRefs(federationReleaseRefs)
 			_ = h.deleteTunnelByID(tunnelID)
 			response.WriteJSON(w, response.ErrDefault(applyErr.Error()))
@@ -722,7 +726,11 @@ func (h *Handler) cleanupTunnelRuntime(tunnelID int64) {
 		return
 	}
 
-	serviceName := fmt.Sprintf("%d_tls", tunnelID)
+	protocol := strings.TrimSpace(tunnel.Protocol)
+	if protocol == "" {
+		protocol = "tls"
+	}
+	serviceName := fmt.Sprintf("%d_%s", tunnelID, protocol)
 	chainName := fmt.Sprintf("chains_%d", tunnelID)
 
 	for _, row := range chainRows {
@@ -816,6 +824,10 @@ func (h *Handler) tunnelUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	defer func() { tx.Rollback() }()
 
+	updateProtocol := "tls"
+	if len(runtimeState.InNodes) > 0 && strings.TrimSpace(runtimeState.InNodes[0].Protocol) != "" {
+		updateProtocol = strings.TrimSpace(runtimeState.InNodes[0].Protocol)
+	}
 	if err := h.repo.UpdateTunnelTx(
 		tx,
 		id,
@@ -826,6 +838,7 @@ func (h *Handler) tunnelUpdate(w http.ResponseWriter, r *http.Request) {
 		asInt(req["status"], 1),
 		inIp,
 		ipPreference,
+		updateProtocol,
 		now,
 	); err != nil {
 		response.WriteJSON(w, response.Err(-2, err.Error()))
@@ -873,7 +886,11 @@ func (h *Handler) tunnelUpdate(w http.ResponseWriter, r *http.Request) {
 	if typeVal == 2 {
 		createdChains, createdServices, applyErr := h.applyTunnelRuntime(runtimeState)
 		if applyErr != nil {
-			h.rollbackTunnelRuntime(createdChains, createdServices, id)
+			updateProtocol := "tls"
+			if len(runtimeState.InNodes) > 0 && strings.TrimSpace(runtimeState.InNodes[0].Protocol) != "" {
+				updateProtocol = strings.TrimSpace(runtimeState.InNodes[0].Protocol)
+			}
+			h.rollbackTunnelRuntime(createdChains, createdServices, id, updateProtocol)
 			h.releaseFederationRuntimeRefs(federationReleaseRefs)
 			_ = h.repo.DeleteFederationTunnelBindingsByTunnel(id)
 			if len(federationReleaseRefs) == 0 && shouldDeferTunnelRuntimeApplyError(applyErr) {
@@ -3362,6 +3379,11 @@ func (h *Handler) addTunnelServiceOnNode(nodeID, tunnelID int64, serviceData []m
 		return errors.New("invalid tunnel service context")
 	}
 	serviceName := fmt.Sprintf("%d_tls", tunnelID)
+	if len(serviceData) > 0 {
+		if name, ok := serviceData[0]["name"].(string); ok && strings.TrimSpace(name) != "" {
+			serviceName = strings.TrimSpace(name)
+		}
+	}
 	return retryTunnelServiceAddWithCleanup(
 		func() error {
 			_, err := h.sendNodeCommand(nodeID, "AddService", serviceData, true, false)
@@ -3375,12 +3397,15 @@ func (h *Handler) addTunnelServiceOnNode(nodeID, tunnelID int64, serviceData []m
 	)
 }
 
-func (h *Handler) rollbackTunnelRuntime(chainNodeIDs, serviceNodeIDs []int64, tunnelID int64) {
+func (h *Handler) rollbackTunnelRuntime(chainNodeIDs, serviceNodeIDs []int64, tunnelID int64, protocol string) {
 	if h == nil || tunnelID <= 0 {
 		return
 	}
+	if protocol == "" {
+		protocol = "tls"
+	}
 	seenServices := make(map[int64]struct{})
-	serviceName := fmt.Sprintf("%d_tls", tunnelID)
+	serviceName := fmt.Sprintf("%d_%s", tunnelID, protocol)
 	for i := len(serviceNodeIDs) - 1; i >= 0; i-- {
 		nodeID := serviceNodeIDs[i]
 		if _, ok := seenServices[nodeID]; ok {
