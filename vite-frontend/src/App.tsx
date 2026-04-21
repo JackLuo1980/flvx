@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 
@@ -44,11 +44,7 @@ const ProtectedRoute = ({
   }, [authenticated, navigate]);
 
   if (!authenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-mesh-gradient">
-        <div className="text-lg text-gray-700 dark:text-gray-200" />
-      </div>
-    );
+    return <Navigate replace to="/" />;
   }
 
   // 如果跳过布局，直接返回子组件
@@ -76,11 +72,7 @@ const LoginRoute = () => {
   }, [authenticated, navigate]);
 
   if (authenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-mesh-gradient">
-        <div className="text-lg text-gray-700 dark:text-gray-200" />
-      </div>
-    );
+    return <Navigate replace to="/dashboard" />;
   }
 
   return <IndexPage />;

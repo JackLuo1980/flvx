@@ -9,6 +9,7 @@ import { Input } from "@/shadcn-bridge/heroui/input";
 import { Button } from "@/shadcn-bridge/heroui/button";
 import { siteConfig } from "@/config/site";
 import { VersionFooter } from "@/components/version-footer";
+import { BrandLogo } from "@/components/brand-logo";
 import { login, LoginData, checkCaptcha, getConfigByName } from "@/api";
 import { writeLoginSession } from "@/utils/session";
 import { useWebViewMode } from "@/hooks/useWebViewMode";
@@ -160,10 +161,8 @@ export default function IndexPage() {
         >
           <Card className="w-full bg-white/20 dark:bg-zinc-900/20 backdrop-blur-3xl shadow-[0_20px_40px_rgba(0,0,0,0.15)] border-white/80 dark:border-white/10 rounded-[32px] p-2 sm:p-4">
             <CardHeader className="pb-0 pt-6 px-6 flex-col items-center">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-4 shadow-sm text-white">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              </div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome to Flvx</h1>
+              <BrandLogo className="w-14 h-14 rounded-2xl mb-4" size={56} />
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">{siteConfig.name}</h1>
               <p className="text-sm text-default-500 mt-2 font-medium">
                 Sign in to manage your networks
               </p>
