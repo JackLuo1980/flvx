@@ -3408,6 +3408,7 @@ func (h *Handler) rollbackTunnelRuntime(chainNodeIDs, serviceNodeIDs []int64, tu
 	}
 	seenServices := make(map[int64]struct{})
 	serviceNames := []string{
+		fmt.Sprintf("tunnel_%d", tunnelID),
 		fmt.Sprintf("%d_tls", tunnelID),
 		fmt.Sprintf("%d_kcp", tunnelID),
 		fmt.Sprintf("%d_wss", tunnelID),
