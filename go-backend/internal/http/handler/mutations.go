@@ -3680,17 +3680,17 @@ func buildTunnelDialerConfig(protocol string) map[string]interface{} {
 		dialer["metadata"] = map[string]interface{}{
 			"kcp.keepalive":   10,
 			"kcp.tcp":         false,
-			"kcp.mode":        "fast2",
-			"kcp.sndwnd":      8192,
-			"kcp.rcvwnd":      8192,
-			"kcp.mtu":         1400,
-			"kcp.sockbuf":     16777216,
-			"kcp.smuxbuf":     16777216,
-			"kcp.streambuf":   8388608,
+			"kcp.mode":        "fast3",
+			"kcp.sndwnd":      4096,
+			"kcp.rcvwnd":      4096,
+			"kcp.mtu":         1350,
+			"kcp.sockbuf":     4194304,
+			"kcp.smuxbuf":     4194304,
+			"kcp.streambuf":   2097152,
 			"kcp.datashard":   10,
 			"kcp.parityshard": 3,
 			"kcp.nocomp":      true,
-			"kcp.nc":          0,
+			"kcp.nc":          1,
 		}
 	}
 	return dialer
@@ -3704,17 +3704,17 @@ func buildTunnelListenerConfig(protocol string) map[string]interface{} {
 		listener["metadata"] = map[string]interface{}{
 			"kcp.keepalive":   10,
 			"kcp.tcp":         false,
-			"kcp.mode":        "fast2",
-			"kcp.sndwnd":      8192,
-			"kcp.rcvwnd":      8192,
-			"kcp.mtu":         1400,
-			"kcp.sockbuf":     16777216,
-			"kcp.smuxbuf":     16777216,
-			"kcp.streambuf":   8388608,
+			"kcp.mode":        "fast3",
+			"kcp.sndwnd":      4096,
+			"kcp.rcvwnd":      4096,
+			"kcp.mtu":         1350,
+			"kcp.sockbuf":     4194304,
+			"kcp.smuxbuf":     4194304,
+			"kcp.streambuf":   2097152,
 			"kcp.datashard":   10,
 			"kcp.parityshard": 3,
 			"kcp.nocomp":      true,
-			"kcp.nc":          0,
+			"kcp.nc":          1,
 		}
 	}
 	return listener
