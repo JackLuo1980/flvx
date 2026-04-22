@@ -730,17 +730,26 @@ func (h *Handler) cleanupTunnelRuntime(tunnelID int64) {
 	if protocol == "" {
 		protocol = "tls"
 	}
-	serviceName := fmt.Sprintf("%d_%s", tunnelID, protocol)
 	chainName := fmt.Sprintf("chains_%d", tunnelID)
+	serviceNames := []string{
+		fmt.Sprintf("tunnel_%d", tunnelID),
+		fmt.Sprintf("%d_tls", tunnelID),
+		fmt.Sprintf("%d_kcp", tunnelID),
+		fmt.Sprintf("%d_wss", tunnelID),
+		fmt.Sprintf("%d_mtls", tunnelID),
+		fmt.Sprintf("%d_mwss", tunnelID),
+		fmt.Sprintf("%d_tcp", tunnelID),
+		fmt.Sprintf("%d_mtcp", tunnelID),
+	}
 
 	for _, row := range chainRows {
 		if row.ChainType == 1 {
 			_, _ = h.sendNodeCommand(row.NodeID, "DeleteChains", map[string]interface{}{"chain": chainName}, false, true)
 		} else if row.ChainType == 2 {
 			_, _ = h.sendNodeCommand(row.NodeID, "DeleteChains", map[string]interface{}{"chain": chainName}, false, true)
-			_, _ = h.sendNodeCommand(row.NodeID, "DeleteService", map[string]interface{}{"services": []string{serviceName}}, false, true)
+			_, _ = h.sendNodeCommand(row.NodeID, "DeleteService", map[string]interface{}{"services": serviceNames}, false, true)
 		} else if row.ChainType == 3 {
-			_, _ = h.sendNodeCommand(row.NodeID, "DeleteService", map[string]interface{}{"services": []string{serviceName}}, false, true)
+			_, _ = h.sendNodeCommand(row.NodeID, "DeleteService", map[string]interface{}{"services": serviceNames}, false, true)
 		}
 	}
 }

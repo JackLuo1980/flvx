@@ -556,6 +556,14 @@ func (h *Handler) cleanOrphanedServices(nodeID int64, services []namedConfigItem
 		}
 
 		parts := strings.Split(name, "_")
+		if len(parts) == 2 && parts[0] == "tunnel" {
+			tunnelID, err := strconv.ParseInt(parts[1], 10, 64)
+			if err == nil && tunnelID > 0 && !h.tunnelExists(tunnelID) {
+				_, _ = h.sendNodeCommand(nodeID, "DeleteService", map[string]interface{}{"services": []string{name}}, false, true)
+			}
+			continue
+		}
+
 		if len(parts) >= 3 {
 			forwardID, err := strconv.ParseInt(parts[0], 10, 64)
 			if err == nil && forwardID > 0 && hasUnboundForwardPeerRuntime {
@@ -569,7 +577,7 @@ func (h *Handler) cleanOrphanedServices(nodeID int64, services []namedConfigItem
 		suffix := parts[len(parts)-1]
 
 		switch suffix {
-		case "tls":
+		case "tls", "kcp", "wss", "mtls", "mwss", "mtcp":
 			tunnelID, err := strconv.ParseInt(parts[0], 10, 64)
 			if err != nil || tunnelID <= 0 || h.tunnelExists(tunnelID) {
 				continue
@@ -577,6 +585,10 @@ func (h *Handler) cleanOrphanedServices(nodeID int64, services []namedConfigItem
 			_, _ = h.sendNodeCommand(nodeID, "DeleteService", map[string]interface{}{"services": []string{name}}, false, true)
 		case "tcp":
 			if len(parts) < 4 {
+				tunnelID, err := strconv.ParseInt(parts[0], 10, 64)
+				if err == nil && tunnelID > 0 && !h.tunnelExists(tunnelID) {
+					_, _ = h.sendNodeCommand(nodeID, "DeleteService", map[string]interface{}{"services": []string{name}}, false, true)
+				}
 				continue
 			}
 			forwardID, err := strconv.ParseInt(parts[0], 10, 64)
