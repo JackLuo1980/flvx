@@ -31,8 +31,8 @@ func IsSafeRemoteAddr(addr string) error {
 	}
 
 	for _, ip := range ips {
-		if ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified() || ip.IsMulticast() {
-			return fmt.Errorf("address resolves to internal or reserved IP: %s", ip.String())
+		if ip.IsLoopback() || ip.IsPrivate() {
+			return fmt.Errorf("address resolves to internal IP: %s", ip.String())
 		}
 	}
 

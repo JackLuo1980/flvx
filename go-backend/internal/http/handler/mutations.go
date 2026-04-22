@@ -1726,7 +1726,7 @@ func (h *Handler) forwardCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	if roleID != 0 {
 		if err := IsSafeRemoteAddr(remoteAddr); err != nil {
-			response.WriteJSON(w, response.Err(403, "禁止将目标地址设置为内部网络或保留地址"))
+			response.WriteJSON(w, response.Err(403, "禁止将目标地址设置为内部网络"))
 			return
 		}
 		if speedIDVal, ok := req["speedId"]; ok && speedIDVal != nil {
@@ -1850,7 +1850,7 @@ func (h *Handler) forwardUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	if actorRole != 0 {
 		if err := IsSafeRemoteAddr(remoteAddr); err != nil {
-			response.WriteJSON(w, response.Err(403, "禁止将目标地址设置为内部网络或保留地址"))
+			response.WriteJSON(w, response.Err(403, "禁止将目标地址设置为内部网络"))
 			return
 		}
 	}
