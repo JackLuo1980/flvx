@@ -121,7 +121,7 @@ func (h *Handler) runHealthChecks(ctx context.Context) {
 
 func (h *Handler) runTunnelQualityProber(ctx context.Context) {
 	defer h.jobsWG.Done()
-	if h == nil || h.qualityProber == nil || !h.isTunnelQualityMonitoringEnabled() {
+	if h == nil || h.qualityProber == nil {
 		return
 	}
 
