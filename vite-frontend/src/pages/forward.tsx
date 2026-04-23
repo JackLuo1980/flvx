@@ -118,6 +118,7 @@ interface Forward {
   outFlow: number;
   serviceRunning: boolean;
   federationShareFlow?: number;
+  maxConn?: number;
   createdTime: string;
   userName?: string;
   userId?: number;
@@ -2115,6 +2116,7 @@ export default function ForwardPage() {
       interfaceName: forward.interfaceName || "",
       strategy: forward.strategy || "fifo",
       speedId: normalizeSpeedId(forward.speedId),
+      maxConn: forward.maxConn || 0,
     });
     setErrors({});
     setModalOpen(true);
